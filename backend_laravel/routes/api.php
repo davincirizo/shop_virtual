@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\CategoryController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\AutenticarController;
 
 
@@ -26,7 +27,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::apiResource('autenticar',AutenticarController::class)->names('autenticar');
 Route::post('registro',[AutenticarController::class,'registro']);
 Route::post('login',[AutenticarController::class,'login']);
+
 Route::apiResource('categories',CategoryController::class);
+
+Route::apiResource('products',ProductController::class);
+
 
 
 

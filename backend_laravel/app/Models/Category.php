@@ -7,11 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name','description', 'qty_product'];
     protected $hidden = [
         'created_at',
         'updated_at'
     ];
 
+    public function getQty_ProductAttribute($value){
+       return $value + 8;
+    }
+
+    public function setQty_ProductAttribute($value){
+        $this->attributes['qty_product'] = $value + 8;
+    }
+
     use HasFactory;
+
+    public function products(){
+        return $this->hasMany('App\Models\Product');
+    }
 }

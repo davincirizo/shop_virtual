@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
+            $table->text('description');
+            $table->integer('qty_product')->nullable();
         });
     }
 

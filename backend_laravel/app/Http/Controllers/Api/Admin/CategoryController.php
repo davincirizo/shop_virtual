@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Product;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Http\Controllers\Api\ProductController;
 
 
 class CategoryController extends Controller
@@ -15,6 +17,12 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
+        $products = Product::all();
+        for($i = 0; $i < count($categories); $i++) {
+            $product_ext = $products->where('category_id','=',$categories[$i]->id);
+            $count = count($product_ext);
+            $categories[$i]->qty_product = $count;
+        }
         // return CategoryResource::collection($categories);
         return response()->json($categories);
     }

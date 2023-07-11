@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product;
 
 class Category extends Model
 {
-    protected $fillable = ['name','description', 'qty_product'];
+    protected $fillable = ['name','description'];
     protected $hidden = [
         'created_at',
         'updated_at'
@@ -26,4 +27,8 @@ class Category extends Model
     public function products(){
         return $this->hasMany('App\Models\Product');
     }
+
+
+
+
 }

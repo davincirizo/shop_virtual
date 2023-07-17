@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Product;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Http\Controllers\Api\ProductController;
 
 
 class CategoryController extends Controller
@@ -14,7 +16,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::setCategory();
+//        setCategory($categories,$products);
         // return CategoryResource::collection($categories);
         return response()->json($categories);
     }

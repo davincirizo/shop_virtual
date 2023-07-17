@@ -29,8 +29,9 @@ class Product extends Model
           return $products;
     }
     public static function searchBy(Category $category){
-        $products = Product::all();
+        $products = Product::covertJson();
         $products_select = $products->where('category_id','=',$category->id);
+
         return $products_select;
     }
 

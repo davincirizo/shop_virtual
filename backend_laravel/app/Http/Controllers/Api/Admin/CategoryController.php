@@ -16,13 +16,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all();
-        $products = Product::all();
-        for($i = 0; $i < count($categories); $i++) {
-            $product_ext = $products->where('category_id','=',$categories[$i]->id);
-            $count = count($product_ext);
-            $categories[$i]->qty_product = $count;
-        }
+        $categories = Category::setCategory();
+//        setCategory($categories,$products);
         // return CategoryResource::collection($categories);
         return response()->json($categories);
     }

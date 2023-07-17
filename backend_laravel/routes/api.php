@@ -28,9 +28,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('registro',[AutenticarController::class,'registro']);
 Route::post('login',[AutenticarController::class,'login']);
 
-Route::apiResource('categories',CategoryController::class);
 
-Route::apiResource('products',ProductController::class);
+//Route Categories
+Route::get('categories',[CategoryController::class,'index']);
+Route::get('categories/{category}',[CategoryController::class,'show']);
+Route::post('categories',[CategoryController::class,'store']);
+Route::put('categories/{category}',[CategoryController::class,'update']);
+Route::delete('categories/{category}',[CategoryController::class,'destroy']);
+
+//Route Products
+Route::get('products',[ProductController::class,'index']);
+Route::get('products/{product}',[ProductController::class,'show']);
+Route::post('products',[ProductController::class,'store']);
+Route::put('products/{product}',[ProductController::class,'update']);
+Route::delete('products/{product}',[ProductController::class,'destroy']);
+Route::get('products/category/{category}',[ProductController::class,'search']);
 
 
 

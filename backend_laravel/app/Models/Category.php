@@ -14,13 +14,6 @@ class Category extends Model
         'updated_at'
     ];
 
-    public function getQty_ProductAttribute($value){
-       return $value + 8;
-    }
-
-    public function setQty_ProductAttribute($value){
-        $this->attributes['qty_product'] = $value + 8;
-    }
 
     use HasFactory;
 
@@ -28,7 +21,18 @@ class Category extends Model
         return $this->hasMany('App\Models\Product');
     }
 
+    public static function setCategory(){
+        $categories = Category::all();
+        $products = Product::all();
 
+        for($i = 0; $i < count($categories); $i++) {
+            $product_ext = $products->where('category_id','=',$categories[$i]->id);
+            $count = count($product_ext);
+            $categories[$i]->qty_product = $count;
+
+        }
+        return $categories;
+    }
 
 
 }

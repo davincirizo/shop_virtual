@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Category;
 
 class ProductController extends Controller
 {
 
     public function index()
     {
-        $products = Product::all();
-        return $products;
+        $productes = Product::covertJson();
+//
+        return ProductResource::collection($productes);
     }
 
 
@@ -37,5 +40,11 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+    }
+
+    public function search(Category $category){
+        $products = Product::searchBy($category);
+        return ProductResource::collection($products);
+
     }
 }

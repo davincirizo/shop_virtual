@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,12 +16,6 @@ class CategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'identificador' => $this->id,
-            'nombre' => $this->name,
-            'fecha de creacion' => $this->created_at->format('d-m-y'),
-            'fecha de actualizacion' => $this->updated_at,
-
-
 
         ];
     }

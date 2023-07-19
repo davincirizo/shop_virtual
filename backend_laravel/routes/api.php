@@ -30,7 +30,6 @@ Route::post('login',[AutenticarController::class,'login']);
 
 
 //Route Categories
-Route::get('categories',[CategoryController::class,'index']);
 Route::get('categories/{category}',[CategoryController::class,'show']);
 Route::post('categories',[CategoryController::class,'store']);
 Route::put('categories/{category}',[CategoryController::class,'update']);
@@ -49,6 +48,8 @@ Route::get('products/category/{category}',[ProductController::class,'search']);
 
 Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post('logout',[AutenticarController::class,'logout']);
+    Route::get('categories',[CategoryController::class,'index']);
+
 });
 
 

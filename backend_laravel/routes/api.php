@@ -49,7 +49,6 @@ Route::get('products/category/{category}',[ProductController::class,'search']);
 
 Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post('logout',[AutenticarController::class,'logout']);
-
 });
 
 

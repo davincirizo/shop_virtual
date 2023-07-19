@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+
 class AutenticarController extends Controller
 {
     public function registro(RegistroRequest $request ){
@@ -37,19 +38,20 @@ class AutenticarController extends Controller
        $token = $user->createToken($request->email)->plainTextToken;
        return response()->json([
             'res' => true,
-            'token' => $token
+            'token' => $token,
+           'data' => $user
        ],200);
 
     }
 
     public function logout(Request $request){
-        auth()->user()->tokens()->delete();
-        // $user->tokens()->where('id', $tokenId)->delete();
-        // $user->tokens()->delete();
-        // $request->user()->currentAccesToken()->delete();
+
+
+//        $user = $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
         return response()->json([
             'res' => true,
-            'msg' => 'Usuario deslogueado correctamente'
+            'msg' => 'Usuario deslogueado correctamente',
        ],200);
 
     }

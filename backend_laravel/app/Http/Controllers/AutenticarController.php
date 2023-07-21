@@ -12,7 +12,20 @@ use Illuminate\Validation\ValidationException;
 
 class AutenticarController extends Controller
 {
-    public function registro(RegistroRequest $request ){
+    public function registro(Request $request ){
+       $rules = [
+            'name' => 'required',
+            'email' => 'required|unique:users,email',
+           'password' => 'required',
+       ];
+        $validator = \Validator::make($request->input(),$rules);
+        if ($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()->all(),
+            ],400);
+        }
+
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
@@ -26,13 +39,31 @@ class AutenticarController extends Controller
 
     }
 
-    public function login(AccesoRequest $request ){
+    public function login(Request $request ){
+        $rules = [
+            'email' => 'required',
+            'password' => 'required',
+        ];
+        $validator = \Validator::make($request->input(),$rules);
+        if ($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()->all(),
+            ],400);
+        }
         $user = User::where('email', $request->email)->first();
+        if(!$user){
+            return response()->json([
+                'status' => false,
+                'errors' => 'Ese usuario no se encuentra',
+            ],400);
+        }
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'msg' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json([
+                'status' => false,
+                'errors' => 'Usuario o contrasenna incorrecta',
+            ],401);
         }
 
        $token = $user->createToken($request->email)->plainTextToken;

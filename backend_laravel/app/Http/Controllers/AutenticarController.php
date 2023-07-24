@@ -22,7 +22,7 @@ class AutenticarController extends Controller
         if ($validator->fails()){
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()->all(),
+                'errors' => $validator->errors(),
             ],400);
         }
 
@@ -48,15 +48,15 @@ class AutenticarController extends Controller
         if ($validator->fails()){
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()->all(),
+                'errors' => $validator->errors(),
             ],400);
         }
         $user = User::where('email', $request->email)->first();
         if(!$user){
             return response()->json([
                 'status' => false,
-                'errors' => 'Ese usuario no se encuentra',
-            ],400);
+                'errors' => 'Usuario o contrasenna incorrecta',
+            ],401);
         }
 
         if (! $user || ! Hash::check($request->password, $user->password)) {

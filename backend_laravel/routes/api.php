@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\AutenticarController;
 use App\Http\Controllers\UserController;
+use App\Mail\Verification;
 
 
 /*
@@ -34,6 +35,7 @@ Route::post('login',[AutenticarController::class,'login']);
 Route::get('categories/{category}',[CategoryController::class,'show']);
 Route::post('categories',[CategoryController::class,'store']);
 Route::put('categories/{category}',[CategoryController::class,'update']);
+Route::get('categories/{category}',[CategoryController::class,'show']);
 Route::delete('categories/{category}',[CategoryController::class,'destroy']);
 
 //Route Products
@@ -48,6 +50,10 @@ Route::get('products/category/{category}',[ProductController::class,'search']);
 Route::put('profile/{user}',[UserController::class,'update']);
 
 
+Route::get('email',function (){
+    $response = Mail::to('rizod3409@gmail.com')->send(new Verification());
+    return $response;
+});
 
 
 

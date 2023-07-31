@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistroRequest;
 use App\Http\Requests\AccesoRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 
 class AutenticarController extends Controller
@@ -25,8 +27,12 @@ class AutenticarController extends Controller
                 'errors' => $validator->errors(),
             ],400);
         }
-
         $user = new User();
+        if($request->file('image')){
+            $file = $request->file('image');
+            $url = Storage::put('users',$file);
+            $user->image = $url;
+        }
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;

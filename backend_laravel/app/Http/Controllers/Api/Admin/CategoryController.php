@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Category;
-use App\Models\Product;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
-use App\Http\Controllers\Api\ProductController;
+use Illuminate\Support\Facades\Storage;
+
+
 
 
 class CategoryController extends Controller
@@ -17,8 +17,6 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::setCategory();
-//        setCategory($categories,$products);
-        // return CategoryResource::collection($categories);
         return response()->json($categories);
     }
 
@@ -26,14 +24,25 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request)
     {
         $category = Category::create($request->all());
+        if($request->file('images')) {
+            $file = $request->file('images');
+            foreach ($file as $qdoc => $eldocu) {
+                $url = Storage::put('categories', $eldocu);
+                $category->images()->create(['url'=>$url]);
+            }
+        }
         return (new CategoryResource($category))->additional(['msg'=>'Categoria creada correctamente']);
     }
 
 
     public function show(Category $category)
     {
-
+        if($category->images()->count() > 0){
+            $category->imagenes = $category->images()->get();
+        }
         return response()->json($category);
+
+
     }
 
 
@@ -50,12 +59,11 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        // $category->delete();
-        // return response()->json([
-        //     'res' => True,
-        //     'msg' => 'Categoria Eliminada Correctamente'
-        // ],200);
+        if($category->images()->count() > 0) {
+            $category->images()->delete();
+        }
         $category->delete();
+
         return (new CategoryResource($category))->additional(['msg'=>'Categoria eliminada correctamente']);
     }
 }

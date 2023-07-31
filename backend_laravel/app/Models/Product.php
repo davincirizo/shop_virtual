@@ -34,5 +34,8 @@ class Product extends Model
 
         return $products_select;
     }
+    public function images(){
+        return $this->morphMany('App\Models\Image','imageable');
+    }
 
 }

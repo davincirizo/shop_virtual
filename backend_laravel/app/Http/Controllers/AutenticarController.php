@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Auth\Events\Registered;
 
 class AutenticarController extends Controller
 {
@@ -33,18 +33,38 @@ class AutenticarController extends Controller
             $url = Storage::put('users',$file);
             $user->image = $url;
         }
+//        $user = User::create($request->all());
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;
         $user->save();
+        $user->sendEmailVerificationNotification();
+
+//        event(new Registered($user));
 
         return response()->json([
             'res' => true,
-            'msg' => 'Usuario registrado correctamente'
+            'msg' => 'Se ha enviado Mensaje a su corre Revise para confirmar'
         ],200);
 
     }
 
+
+    public function verifyEmail(Request $request, $id, $hash)
+    {
+        $user = User::all();
+        $user ->where('id', '=',$id);
+//            ->where('verification_token', $hash)
+//            ->firstOrFail();
+
+        $user[0]->email_verified_at = now();
+//        $user[0]->verification_token = null;
+        $user[0]->update();
+
+        return response()->json([
+            'message' => 'Correo electrónico verificado con éxito.'
+        ], 200);
+    }
     public function login(Request $request ){
         $rules = [
             'email' => 'required',

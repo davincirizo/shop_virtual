@@ -8,7 +8,7 @@ use App\Http\Controllers\AutenticarController;
 use App\Http\Controllers\UserController;
 use App\Mail\Verification;
 use \Laravel\Fortify\Http\Controllers\RegisteredUserController;
-
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,8 +31,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::post('registro',[AutenticarController::class,'registro']);
-Route::post('login',[AutenticarController::class,'login']);
-Route::get('email/verify/{id}/{hash}', [AutenticarController::class,'verifyEmail'])->middleware(['auth', 'signed']);
+Route::get('email/verify/{id}/{hash}', [AutenticarController::class,'verifyEmail']);
+Route::post('email/verification-notification', [AutenticarController::class,'resend_email']);
+
+//Route::post('/email/verification-notification', function (Request $request) {
+//    $request->user()->sendEmailVerificationNotification();
+//
+//    return back()->with('message', 'Verification link sent!');
+//})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
 
 //Route Categories
 Route::get('categories/{category}',[CategoryController::class,'show']);
@@ -66,10 +74,14 @@ Route::get('email',function (){
 //});
 
 
-Route::group(['middleware' => ['auth:sanctum']],function(){
+Route::group(['middleware' => ['auth:sanctum','verified']],function(){
     Route::post('logout',[AutenticarController::class,'logout']);
     Route::get('categories',[CategoryController::class,'index']);
 
+});
+
+Route::group(['middleware' => ['verified']],function(){
+    Route::post('login',[AutenticarController::class,'login']);
 });
 
 

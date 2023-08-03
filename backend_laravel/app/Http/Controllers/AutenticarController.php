@@ -40,6 +40,8 @@ class AutenticarController extends Controller
         $user->save();
         $user->sendEmailVerificationNotification();
 
+
+
 //        event(new Registered($user));
 
         return response()->json([
@@ -49,22 +51,62 @@ class AutenticarController extends Controller
 
     }
 
+    public function resend_email(Request $request ){
+//        if() {
+        $user_all = User::all();
+        $user = $user_all->where('email', '=',$request->email);
+        if(count($user)) {
+            if( !$user[0]->email_verified_at) {
+                $user[0]->sendEmailVerificationNotification();
+                return response()->json([
+                    'message' => 'Mensaje enviado correctamente. Revise su correo nuevamente'
+                ], 200);
+            }
+            else{
+                return response()->json([
+                    'message' => 'Este usuario tiene el correo confirmado'
+                ], 201);
+            }
+        }
+        else{
+            return false;
+        }
+//        }
+    }
+
 
     public function verifyEmail(Request $request, $id, $hash)
     {
-        $user = User::all();
-        $user ->where('id', '=',$id);
-//            ->where('verification_token', $hash)
-//            ->firstOrFail();
+        $user_all = User::all();
 
-        $user[0]->email_verified_at = now();
-//        $user[0]->verification_token = null;
-        $user[0]->update();
+        $user = $user_all->where('id', '=',$id)->first();
+        if(!$user){
+            return response()->json([
+                'message' => 'Este usuario no existe'
+            ], 401);
+        }
+
+        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            return response()->json([
+                'message' => 'URL Erronea'
+            ], 401);
+        }
+
+        if (!$user->hasVerifiedEmail()){
+            $user->markEmailAsVerified();
+        }
+        else{
+            return response()->json([
+                'message' => 'Este correo Esta actualmente Verificado'
+            ], 201);
+        }
 
         return response()->json([
             'message' => 'Correo electrónico verificado con éxito.'
         ], 200);
     }
+
+
     public function login(Request $request ){
         $rules = [
             'email' => 'required',

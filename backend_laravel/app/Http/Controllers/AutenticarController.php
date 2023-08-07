@@ -2,24 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Verification;
+use Carbon\Carbon;
+use Closure;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistroRequest;
 use App\Http\Requests\AccesoRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\Events\Registered;
+use \Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Illuminate\Support\Facades\Mail;
 
-class AutenticarController extends Controller
+class AutenticarController  extends Controller
+
 {
-    public function registro(Request $request ){
-       $rules = [
+
+    public function registro(Request $request){
+        $rules = [
             'name' => 'required',
             'email' => 'required|unique:users,email',
-           'password' => 'required',
-       ];
+            'password' => 'required',
+        ];
         $validator = \Validator::make($request->input(),$rules);
         if ($validator->fails()){
             return response()->json([
@@ -33,43 +45,42 @@ class AutenticarController extends Controller
             $url = Storage::put('users',$file);
             $user->image = $url;
         }
-//        $user = User::create($request->all());
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;
         $user->save();
-        $user->sendEmailVerificationNotification();
+        $user->sendEmailVerification();
 
-
-
-//        event(new Registered($user));
 
         return response()->json([
             'res' => true,
             'msg' => 'Se ha enviado Mensaje a su corre Revise para confirmar'
         ],200);
 
+
     }
 
     public function resend_email(Request $request ){
 //        if() {
         $user_all = User::all();
-        $user = $user_all->where('email', '=',$request->email);
-        if(count($user)) {
-            if( !$user[0]->email_verified_at) {
-                $user[0]->sendEmailVerificationNotification();
+        $user = $user_all->where('email', '=',$request->email)->first();
+        if($user) {
+            if( !$user->email_verified_at) {
+                $user->sendEmailVerification();
                 return response()->json([
                     'message' => 'Mensaje enviado correctamente. Revise su correo nuevamente'
-                ], 200);
+                ], 201);
             }
             else{
                 return response()->json([
                     'message' => 'Este usuario tiene el correo confirmado'
-                ], 201);
+                ], 202);
             }
         }
         else{
-            return false;
+            return response()->json([
+                'message' => 'Este usuario no se encuantra'
+                ], 404);
         }
 //        }
     }
@@ -83,13 +94,13 @@ class AutenticarController extends Controller
         if(!$user){
             return response()->json([
                 'message' => 'Este usuario no existe'
-            ], 401);
+            ], 404);
         }
 
-        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+        if ($hash != $user->hash) {
             return response()->json([
                 'message' => 'URL Erronea'
-            ], 401);
+            ], 404);
         }
 
         if (!$user->hasVerifiedEmail()){
@@ -104,6 +115,50 @@ class AutenticarController extends Controller
         return response()->json([
             'message' => 'Correo electrónico verificado con éxito.'
         ], 200);
+    }
+
+    public function forgot_password(Request $request){
+        $request->validate(['email' => 'required|email']);
+        $user_all = User::all();
+        $user = $user_all->where('email', '=', $request->email)->first();
+        if(!$user){
+            return response()->json([
+                'status' => false,
+                'errors' => 'Usuario no Encontrado',
+            ],404);
+        }
+
+        $user->sendEmailForgotPassword();
+
+        return response()->json([
+            'status' => true,
+            'errors' => 'Le enviamos el correo para que autentique su contrasenna',
+        ],200);
+
+    }
+
+    public function get_forgot_password(Request $request,$token){
+        $search_reset = DB::table('password_reset_tokens')->where('token',$token)->first();
+        if(!$search_reset){
+            return response()->json([
+                'status' => false,
+                'message' => 'Token No Valiudo',
+            ],404);
+        }
+        else{
+            $user_all = User::all();
+            $user = $user_all->where('email','=',$search_reset->email)->first();
+            $user->password = $request->password;
+            $user->save();
+            $search_delete = DB::table('password_reset_tokens')->where('token',$token)->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Contrasenna correactamente modificada',
+            ],200);
+
+        }
+
+
     }
 
 
@@ -154,7 +209,6 @@ class AutenticarController extends Controller
        ],200);
 
     }
-
 
 
 

@@ -33,12 +33,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('registro',[AutenticarController::class,'registro']);
 Route::get('email/verify/{id}/{hash}', [AutenticarController::class,'verifyEmail']);
 Route::post('email/verification-notification', [AutenticarController::class,'resend_email']);
+Route::post('/forgot-password', [AutenticarController::class,'forgot_password']);
+Route::post('/reset-password/{token}',[AutenticarController::class,'get_forgot_password']);
 
-//Route::post('/email/verification-notification', function (Request $request) {
-//    $request->user()->sendEmailVerificationNotification();
-//
-//    return back()->with('message', 'Verification link sent!');
-//})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 
 
@@ -50,7 +47,6 @@ Route::get('categories/{category}',[CategoryController::class,'show']);
 Route::delete('categories/{category}',[CategoryController::class,'destroy']);
 
 //Route Products
-Route::get('products',[ProductController::class,'index']);
 Route::get('products/{product}',[ProductController::class,'show']);
 Route::post('products',[ProductController::class,'store']);
 Route::put('products/{product}',[ProductController::class,'update']);
@@ -67,26 +63,18 @@ Route::get('email',function (){
     return $response;
 });
 
-//Route::group(['middleware' => ['auth']], function() {
-//    Route::get('/email/verify', 'VerificationController@show');
-//    Route::get('/email/verify/{id}/{hash}', 'VerificationController@verify');
-//    Route::post('/email/resend', 'VerificationController@resend');
-//});
 
-
-Route::group(['middleware' => ['auth:sanctum','verified']],function(){
+Route::group(['middleware' => ['aut']],function(){
     Route::post('logout',[AutenticarController::class,'logout']);
     Route::get('categories',[CategoryController::class,'index']);
+    Route::get('products',[ProductController::class,'index']);
 
 });
 
-Route::group(['middleware' => ['verified']],function(){
+Route::group(['middleware' => ['verify-emai']],function(){
     Route::post('login',[AutenticarController::class,'login']);
+    Route::post('/forgot-password', [AutenticarController::class,'forgot_password']);
 });
 
 
-
-
-
-// Route::get('admin/categories',[CategoryController::class,'index']);
 

@@ -8,10 +8,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
-class Verification extends Mailable
+class ForgotPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -22,6 +20,7 @@ class Verification extends Mailable
     public function __construct($url_user)
     {
         $this->url = $url_user;
+
     }
 
     /**
@@ -30,7 +29,7 @@ class Verification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mensaje de Confirmacion de usuario',
+            subject: 'Forgot Password',
         );
     }
 
@@ -40,7 +39,7 @@ class Verification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email',
+            view: 'reset_password',
         );
     }
 
@@ -53,6 +52,4 @@ class Verification extends Mailable
     {
         return [];
     }
-
-
 }

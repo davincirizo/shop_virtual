@@ -94,13 +94,13 @@ class AutenticarController  extends Controller
         if(!$user){
             return response()->json([
                 'message' => 'Este usuario no existe'
-            ], 404);
+            ], 400);
         }
 
         if ($hash != $user->hash) {
             return response()->json([
                 'message' => 'URL Erronea'
-            ], 404);
+            ], 400);
         }
 
         if (!$user->hasVerifiedEmail()){
